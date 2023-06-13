@@ -19,7 +19,7 @@ data class PhotoResponse(
     @SerializedName("exif")
     val exif: Exif?,
     @SerializedName("height")
-    val height: Int?,
+    val height: Int,
     @SerializedName("id")
     val id: String?,
     @SerializedName("liked_by_user")
@@ -37,5 +37,5 @@ data class PhotoResponse(
     @SerializedName("user")
     val user: User?,
     @SerializedName("width")
-    val width: Int?
+    val width: Int
 )
