@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences.Editor
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fastcampus.aop.part4.aop_part4_chapter07.data.Repository
@@ -13,6 +15,7 @@ import fastcampus.aop.part4.aop_part4_chapter07.databinding.ActivityMainBinding
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class MainActivity : AppCompatActivity() {
 
@@ -66,11 +69,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fetchRandomPhotos(query: String? = null) = scope.launch {
-        Repository.getRandomPhotos(query)?.let { photos ->
-            (binding.recyclerView.adapter as? PhotoAdapter)?.apply {
-                this.photos = photos
-                notifyDataSetChanged()
+        try {
+            Repository.getRandomPhotos(query)?.let { photos ->
+
+                binding.errorDescriptionTextView.visibility = View.GONE
+                (binding.recyclerView.adapter as? PhotoAdapter)?.apply {
+                    this.photos = photos
+                    notifyDataSetChanged()
+
+                }
             }
+            binding.recyclerView.visibility = View.VISIBLE
+        } catch (exception: Exception) {
+            binding.recyclerView.visibility = View.INVISIBLE
+            binding.errorDescriptionTextView.visibility = View.VISIBLE
+        } finally {
+            binding.shimmerLayout.visibility = View.GONE
             binding.refreshLayout.isRefreshing = false
         }
     }
