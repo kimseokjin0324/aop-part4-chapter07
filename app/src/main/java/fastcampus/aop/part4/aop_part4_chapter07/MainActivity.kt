@@ -1,9 +1,9 @@
 package fastcampus.aop.part4.aop_part4_chapter07
 
 import android.Manifest
+import android.app.WallpaperManager
 import android.content.ContentValues
 import android.content.Context
-import android.content.SharedPreferences.Editor
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -16,7 +16,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -177,6 +176,31 @@ class MainActivity : AppCompatActivity() {
                         transition: Transition<in Bitmap>?
                     ) {
                         saveBitmapToMediaStore(resource)
+
+                        val wallpaperManager = WallpaperManager.getInstance(this@MainActivity)
+
+
+                        //- 다운로드 완료
+                        val snackbar = Snackbar.make(
+                            binding.root,
+                            " 다운로드 완료",
+                            Snackbar.LENGTH_SHORT
+                        )
+
+                        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                                    && wallpaperManager.isSetWallpaperAllowed)
+                            && wallpaperManager.isWallpaperSupported
+                        ) {
+                            snackbar.setAction("배경 화면으로 저장") {
+                                try {
+                                    wallpaperManager.setBitmap(resource)
+                                } catch (exception: Exception) {
+                                    Snackbar.make(binding.root, "배경화면 저장 실패", Snackbar.LENGTH_SHORT)
+                                }
+                            }
+                            snackbar.duration = Snackbar.LENGTH_INDEFINITE
+                        }
+                        snackbar.show()
                     }
 
                     override fun onLoadStarted(placeholder: Drawable?) {
@@ -246,8 +270,7 @@ class MainActivity : AppCompatActivity() {
             resolver.update(imageUri, imageDetails, null, null)
         }
 
-        //- 다운로드 완료
-        Snackbar.make(binding.root, " 다운로드 완료", Snackbar.LENGTH_SHORT).show()
+
     }
 
     companion object {
